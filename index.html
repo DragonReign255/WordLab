@@ -14,7 +14,7 @@
 <div class="site-shell">
 <header class="site-header">
  <div class="brand"><div class="brand-mark" aria-hidden="true"><span>W</span><span>L</span></div><div><strong>WORDLAB</strong><small>THE WORD GAME WORKSHOP</small></div></div>
- <div class="header-actions"><span id="saveState" class="save-status">● Local saves</span><button type="button" id="installBtn" class="btn btn-soft" hidden>Install app</button><button type="button" id="customizeBtn" class="btn btn-soft">Customize ↗</button></div>
+ <div class="header-actions"><span id="saveState" class="save-status">● Local saves</span><button type="button" id="installBtn" class="btn btn-soft" hidden>Install app</button><button type="button" id="customizeBtn" class="btn btn-soft">Customize 🎨</button></div>
 </header>
 <div class="app-grid">
 <main class="play-column" id="playArea">
@@ -47,6 +47,16 @@
 <button type="submit" id="startGame" class="btn btn-primary start-game">BUILD & PLAY ↗</button><p class="small-info">A new game replaces the active one. Your completed-game statistics are retained.</p>
 </form><div class="offline-info"><strong>OFFLINE + ONLINE DICTIONARY</strong><p>A full local word list works offline. When connected, the app can load a broader English word list and cache it for later use. Accepted guesses include proper names from topical puzzles.</p><p id="dataStatus">Loading local dictionary…</p><p id="onlineStatus" role="status" aria-live="polite">Checking connection…</p><div class="dictionary-tools"><span id="dictionaryCount">Local words loading</span><button type="button" class="text-action" id="refreshDictionary">Refresh online dictionary ↗</button></div></div>
 </aside></div>
+
+<dialog id="appearanceDialog" class="appearance-dialog" aria-labelledby="appearanceTitle">
+ <div class="appearance-head"><div><span class="eyebrow">PERSONALIZE WORDLAB</span><h2 id="appearanceTitle">Appearance & accessibility</h2></div><button type="button" id="appearanceClose" class="appearance-x" aria-label="Close customization">×</button></div>
+ <p class="microcopy">These preferences affect only this device and are saved automatically. They do not change the puzzle rules.</p>
+ <label class="field full">Color preset<select id="appearancePreset"><option value="original">Original dark</option><option value="ocean">Ocean blue</option><option value="forest">Forest</option><option value="sunset">Sunset</option><option value="light">Light</option><option value="custom">Custom colors</option></select></label>
+ <div class="appearance-colors"><label>Background <input type="color" id="appearanceBg"></label><label>Panels <input type="color" id="appearancePanel"></label><label>Text <input type="color" id="appearanceInk"></label><label>Accent <input type="color" id="appearanceAccent"></label><label>Correct <input type="color" id="appearanceGreen"></label><label>Present <input type="color" id="appearanceYellow"></label><label>Absent <input type="color" id="appearanceGray"></label></div>
+ <label class="field full">Text size<select id="appearanceSize"><option value="90">Compact (90%)</option><option value="100">Default (100%)</option><option value="110">Large (110%)</option><option value="125">Extra large (125%)</option></select></label>
+ <label class="switch-line"><input type="checkbox" id="appearanceMotion"><span>Reduce animations and transitions</span></label>
+ <div class="appearance-actions"><button type="button" id="appearanceReset" class="btn btn-soft">Restore defaults</button><button type="button" id="appearanceDone" class="btn btn-primary">Done</button></div>
+</dialog>
 <dialog id="addWordDialog" class="word-dialog" aria-labelledby="addWordTitle"><form id="addWordForm" method="dialog"><h2 id="addWordTitle">Add a word</h2><p class="microcopy">Add a 3–9 letter word to a selected category. Your additions are saved on this device, including words not in the offline dictionary.</p><label class="field full">Word<input id="newWord" type="text" minlength="3" maxlength="9" pattern="[A-Za-z]{3,9}" autocomplete="off" spellcheck="false" required placeholder="Enter a word"></label><label class="field full">Category<select id="newWordCategory" required></select></label><label class="field full">Subcategory<select id="newWordSubcategory" required></select></label><p id="addWordStatus" class="microcopy" role="status"></p><div class="dialog-actions"><button type="button" id="addWordCancel" class="btn btn-soft">Cancel</button><button type="submit" class="btn btn-primary">Add word</button></div></form></dialog><footer class="footer">WORDLAB · A PRIVATE, LOCAL-FIRST WORD GAME <span>Dictionary-backed guesses · Curated answers · No accounts</span></footer></div>
 <script defer src="app.js"></script>
 </body></html>

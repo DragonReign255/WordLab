@@ -397,7 +397,47 @@ async function copyRunSeed(){
  catch(e){message('Unable to copy automatically. Seed: '+seed,'error');}
 }
 
-function events(){for(const id of formFields)$(id).addEventListener('change',setupConditional);$('seedValue').addEventListener('input',()=>{seedError='';});$('categorySearch').addEventListener('input',filterCats);$('allCategories').addEventListener('click',()=>{selected.clear();redrawChecks();});$('clearCategories').addEventListener('click',()=>{selected.clear();$('categorySearch').value='';filterCats();for(const section of $('categories').querySelectorAll('details'))section.open=false;redrawChecks();});$('setup').addEventListener('submit',e=>{e.preventDefault();startGame();});$('customizeBtn').addEventListener('click',()=>$('settingsPanel').scrollIntoView({behavior:'smooth',block:'start'}));$('startHint').addEventListener('click',()=>showHint('start'));$('lastHint').addEventListener('click',()=>showHint('last'));$('primaryAction').addEventListener('click',goNext);$('restart').addEventListener('click',()=>{if(active)startGame();});$('copyRunSeed').addEventListener('click',copyRunSeed);$('addWordOpen').addEventListener('click',()=>{$('addWordStatus').textContent='';populateWordCategories();$('addWordDialog').showModal();$('newWord').focus();});$('addWordCancel').addEventListener('click',()=>$('addWordDialog').close());$('newWordCategory').addEventListener('change',populateWordSubcategories);$('addWordForm').addEventListener('submit',addCustomWord);$('exportData').addEventListener('click',exportProgress);$('importData').addEventListener('change',e=>importProgress(e.target.files[0]));$('makeChallenge').addEventListener('click',makeCode);$('copyChallenge').addEventListener('click',copyCode);$('loadChallenge').addEventListener('click',loadChallenge);$('refreshDictionary').addEventListener('click',()=>loadOnlineDictionary(true));
+// Device-only appearance preferences, separate from game progress.
+const APPEARANCE_KEY='wordlab-appearance-v1';
+const PALETTES={
+ original:{bg:'#101a23',panel:'#16232e',ink:'#ecf1ef',accent:'#b6db71',green:'#468d6b',yellow:'#d1ac4c',gray:'#455a68'},
+ ocean:{bg:'#0b1b2b',panel:'#132b42',ink:'#edf6ff',accent:'#71c7ec',green:'#268c87',yellow:'#e3b45b',gray:'#466177'},
+ forest:{bg:'#101e17',panel:'#1b3225',ink:'#edf5e9',accent:'#a8da80',green:'#448e60',yellow:'#d9b455',gray:'#52675b'},
+ sunset:{bg:'#251820',panel:'#382630',ink:'#fff1e8',accent:'#f6a873',green:'#c05e7e',yellow:'#edbd65',gray:'#715c6b'},
+ light:{bg:'#f1f4f6',panel:'#ffffff',ink:'#172c39',accent:'#59803d',green:'#378367',yellow:'#b68a24',gray:'#778c9b'}
+};
+const COLOR_KEYS=['bg','panel','ink','accent','green','yellow','gray'];
+let appearance={preset:'original',colors:{...PALETTES.original},size:100,motion:false};
+function applyAppearance(){
+ const root=document.documentElement;
+ for(const key of COLOR_KEYS)root.style.setProperty('--'+key,appearance.colors[key]);
+ root.style.setProperty('--wordlab-font-scale',String(appearance.size/100));
+ document.body.classList.toggle('wordlab-reduced-motion',appearance.motion);
+ const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.content=appearance.colors.bg;
+}
+function saveAppearance(){try{localStorage.setItem(APPEARANCE_KEY,JSON.stringify(appearance));}catch(_){}}
+function restoreAppearance(){try{const data=JSON.parse(localStorage.getItem(APPEARANCE_KEY)||'null');if(data&&typeof data==='object'){
+  const preset=Object.hasOwn(PALETTES,data.preset)?data.preset:'custom';
+  const base=PALETTES[preset]||PALETTES.original;
+  const colors={...base};for(const key of COLOR_KEYS)if(/^#[0-9a-f]{6}$/i.test(data.colors?.[key]||''))colors[key]=data.colors[key];
+  appearance={preset,colors,size:[90,100,110,125].includes(data.size)?data.size:100,motion:!!data.motion};
+ }}catch(_){}applyAppearance();}
+function syncAppearanceForm(){
+ $('appearancePreset').value=appearance.preset;
+ for(const key of COLOR_KEYS)$('appearance'+key[0].toUpperCase()+key.slice(1)).value=appearance.colors[key];
+ $('appearanceSize').value=String(appearance.size);$('appearanceMotion').checked=appearance.motion;
+}
+function setupAppearance(){
+ restoreAppearance();
+ $('customizeBtn').addEventListener('click',()=>{syncAppearanceForm();$('appearanceDialog').showModal();});
+ for(const id of ['appearanceClose','appearanceDone'])$(id).addEventListener('click',()=>$('appearanceDialog').close());
+ $('appearancePreset').addEventListener('change',e=>{const preset=e.target.value;if(PALETTES[preset]){appearance.preset=preset;appearance.colors={...PALETTES[preset]};}else appearance.preset='custom';applyAppearance();syncAppearanceForm();saveAppearance();});
+ for(const key of COLOR_KEYS){$('appearance'+key[0].toUpperCase()+key.slice(1)).addEventListener('input',e=>{appearance.colors[key]=e.target.value;appearance.preset='custom';$('appearancePreset').value='custom';applyAppearance();saveAppearance();});}
+ $('appearanceSize').addEventListener('change',e=>{appearance.size=Number(e.target.value);applyAppearance();saveAppearance();});
+ $('appearanceMotion').addEventListener('change',e=>{appearance.motion=e.target.checked;applyAppearance();saveAppearance();});
+ $('appearanceReset').addEventListener('click',()=>{appearance={preset:'original',colors:{...PALETTES.original},size:100,motion:false};applyAppearance();syncAppearanceForm();saveAppearance();});
+}
+function events(){for(const id of formFields)$(id).addEventListener('change',setupConditional);$('seedValue').addEventListener('input',()=>{seedError='';});$('categorySearch').addEventListener('input',filterCats);$('allCategories').addEventListener('click',()=>{selected.clear();redrawChecks();});$('clearCategories').addEventListener('click',()=>{selected.clear();$('categorySearch').value='';filterCats();for(const section of $('categories').querySelectorAll('details'))section.open=false;redrawChecks();});$('setup').addEventListener('submit',e=>{e.preventDefault();startGame();});$('startHint').addEventListener('click',()=>showHint('start'));$('lastHint').addEventListener('click',()=>showHint('last'));$('primaryAction').addEventListener('click',goNext);$('restart').addEventListener('click',()=>{if(active)startGame();});$('copyRunSeed').addEventListener('click',copyRunSeed);$('addWordOpen').addEventListener('click',()=>{$('addWordStatus').textContent='';populateWordCategories();$('addWordDialog').showModal();$('newWord').focus();});$('addWordCancel').addEventListener('click',()=>$('addWordDialog').close());$('newWordCategory').addEventListener('change',populateWordSubcategories);$('addWordForm').addEventListener('submit',addCustomWord);$('exportData').addEventListener('click',exportProgress);$('importData').addEventListener('change',e=>importProgress(e.target.files[0]));$('makeChallenge').addEventListener('click',makeCode);$('copyChallenge').addEventListener('click',copyCode);$('loadChallenge').addEventListener('click',loadChallenge);$('refreshDictionary').addEventListener('click',()=>loadOnlineDictionary(true));
  document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,select,textarea,button'))return;if(['Backspace','Delete','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();editLetter(e.key);return;}if(e.key==='Enter'){e.preventDefault();submit();return;}if(/^[a-z]$/i.test(e.key)){e.preventDefault();addLetter(e.key);}});
  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;$('installBtn').hidden=false;});$('installBtn').addEventListener('click',async()=>{if(!installPrompt)return;await installPrompt.prompt();installPrompt=null;$('installBtn').hidden=true;});window.addEventListener('appinstalled',()=>{$('installBtn').hidden=true;});
 }
@@ -471,7 +511,7 @@ async function lookupWord(word){
  }catch(_){ /* No connection, CORS, or no entry: retain offline behavior. */ }
  return false;
 }
-async function init(){loadSaved();for(let i=3;i<=20;i++){const option=document.createElement('option');option.value=String(i);option.textContent=i+' guesses';if(i===6)option.selected=true;$('attempts').append(option);}restoreForm(app.settings);events();
+async function init(){setupAppearance();loadSaved();for(let i=3;i<=20;i++){const option=document.createElement('option');option.value=String(i);option.textContent=i+' guesses';if(i===6)option.selected=true;$('attempts').append(option);}restoreForm(app.settings);events();
  try{if(window.WORDLAB_EMBEDDED){categories=window.WORDLAB_EMBEDDED.categories;chains=window.WORDLAB_EMBEDDED.chains||{};dictionary=new Set(window.WORDLAB_EMBEDDED.dictionary.split(/\s+/).filter(Boolean));}else{const [catResp,dictResp,chainsResp]=await Promise.all([fetch('categories.json'),fetch('dictionary.txt'),fetch('chains.json')]);if(!catResp.ok||!dictResp.ok||!chainsResp.ok)throw Error('Data files unavailable.');categories=await catResp.json();chains=await chainsResp.json();dictionary=new Set((await dictResp.text()).split(/\s+/).filter(Boolean));}
  for(const theme of Object.keys(chains)){const option=document.createElement('option');option.value=theme;option.textContent=theme;$('chainTheme').append(option);}
  for(let n=3;n<=9;n++){for(const id of ['chainMin','chainMax']){const option=document.createElement('option');option.value=String(n);option.textContent=n+' letters';$(id).append(option);}const option=document.createElement('option');option.value=String(n);option.textContent=n+' words';$('chainCount').append(option);}
