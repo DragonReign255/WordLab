@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='wordlab-offline-v016-appearance1';
+const CACHE='wordlab-offline-v016-challenge2';
 const FILES=['./','./index.html','./styles.css','./app.js','./categories.json','./chains.json','./dictionary.txt','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k.startsWith('wordlab-offline-')).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
